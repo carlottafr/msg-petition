@@ -1,0 +1,15 @@
+<h1>Welcome to my Petition</h1>
+
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Id, accusamus iure. Quam, modi dolorem voluptatem inventore nostrum dolore, eligendi qui dolorum illum explicabo similique doloribus nemo? Ea omnis perspiciatis distinctio.</p>
+
+{{#if error}}
+<h2>Oh no, something went wrong. Please try again!</h2>
+{{/if}}
+
+<form method="POST">
+    <input name="first" type="text" placeholder="First name" autocomplete="off">
+    <input name="last" type="text" placeholder="Last name" autocomplete="off">
+    <input type="hidden" name="signature" value="placeholder">
+    <canvas width="600px" height="100px"></canvas>
+    <button>Submit</button>
+</form>

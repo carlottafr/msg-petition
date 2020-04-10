@@ -2,11 +2,18 @@ const express = require("express");
 const app = express();
 const db = require("./db");
 const hb = require("express-handlebars");
+const cookieParser = require("cookie-parser");
+
+// Handlebars
 
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
+// Serve /public files
+
 app.use(express.static("./public"));
+
+// Request body parser
 
 app.use(
     express.urlencoded({
@@ -14,25 +21,42 @@ app.use(
     })
 );
 
+// Cookie Parser
+
+app.use(cookieParser());
+
 app.get("/", (req, res) => {
     res.redirect("/petition");
 });
 
 app.get("/petition", (req, res) => {
-    res.render("petition");
+    if (!req.cookies.cookie) {
+        res.render("petition");
+    } else {
+        res.redirect("/thanks");
+    }
 });
 
 app.post("/petition", (req, res) => {
-    console.log("Request body first name: ", req.body.first);
     let first = req.body.first;
     let last = req.body.last;
-    db.getFullName(first, last)
-        .then(() => {
-            console.log("That worked!");
-        })
-        .catch((err) => {
-            console.log("Error in getFullName: ", err);
-        });
+    let signature = req.body.signature;
+    if (first != "" && last != "" && signature != "") {
+        db.getFullName(first, last)
+            .then(() => {
+                console.log("That worked!");
+            })
+            .catch((err) => {
+                console.log("Error in getFullName: ", err);
+            });
+        res.cookie("cookie", "signed");
+        res.redirect("/thanks");
+    } else if (
+        req.statusCode != 200 ||
+        (first == "" && last == "" && signature == "placeholder")
+    ) {
+        res.render("petition", { error: true });
+    }
 });
 
 app.post("/add-city", (req, res) => {
