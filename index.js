@@ -50,7 +50,7 @@ app.post("/petition", (req, res) => {
     let signature = req.body.signature;
     if (first != "" && last != "" && signature != "") {
         // insert the data as values in my signatures table
-        db.getFullName(first, last)
+        db.getFullName(first, last, signature)
             .then(() => {
                 console.log("That worked!");
             })
@@ -64,7 +64,7 @@ app.post("/petition", (req, res) => {
         // there is either an error or
         req.statusCode != 200 ||
         // the values are empty
-        (first == "" && last == "" && signature == "placeholder")
+        (first == "" && last == "" && signature == "")
     ) {
         // render the petition template with error helper
         res.render("petition", { error: true });
