@@ -35,8 +35,8 @@ app.get("/petition", (req, res) => {
     // no cookie is set
     if (!req.cookies.cookie) {
         res.render("petition");
-        // cookie is set
     } else {
+        // cookie is set
         res.redirect("/thanks");
     }
 });
@@ -70,12 +70,43 @@ app.post("/petition", (req, res) => {
         res.render("petition", { error: true });
     }
 });
+
 // GET /thanks
 
 app.get("/thanks", (req, res) => {
+    // if a cookie is set, render with total number of supporters
+    if (req.cookies.cookie) {
+        db.countSupports()
+            .then((result) => {
+                console.log("Supporters have been counted: ", result);
+                return result;
+            })
+            .then((result) => {
+                res.render("thanks", { number: result });
+            })
+            .catch((err) => {
+                console.log("Error in countSupports: ", err);
+            });
+    } else {
+        res.redirect("/petition");
+    }
+});
+
+// GET /signers
+
+app.get("/signers", (req, res) => {
     // if a cookie is set, render
     if (req.cookies.cookie) {
-        res.render("thanks");
+        db.getSupporters()
+            .then((result) => {
+                return result.rows;
+            })
+            .then((results) => {
+                res.render("signers", { supporters: results });
+            })
+            .catch((err) => {
+                console.log("Error in getSupporters: ", err);
+            });
         // if not, redirect
     } else {
         res.redirect("/petition");

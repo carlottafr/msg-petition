@@ -10,15 +10,12 @@ module.exports.getFullName = (first, last) => {
     ]);
 };
 
-// module.exports.getCities = () => {
-//     return db.query(`SELECT * FROM cities`);
-// };
+module.exports.countSupports = () => {
+    return db.query(`SELECT COUNT(*) FROM signatures`).then((results) => {
+        return results.rows[0].count;
+    });
+};
 
-module.exports.addCity = (city, country) => {
-    return db.query(
-        `
-    INSERT INTO cities (city, country) VALUES ($1, $2)
-    `,
-        [city, country]
-    );
+module.exports.getSupporters = () => {
+    return db.query(`SELECT first, last FROM signatures;`);
 };
