@@ -8,8 +8,9 @@
     let startTop;
     let moveLeft;
     let moveTop;
-    let coordinates = [];
-    // maybe work with two sets of coordinates to prevent
+    let coordinatesMoveTo = [];
+    let coordinatesDrawing = [];
+    // trying to work with two sets of coordinates to prevent
     // one consistent line-drawing
 
     $("canvas").on("mousedown", (event) => {
@@ -17,13 +18,13 @@
         startLeft = event.clientX - offset.left;
         startTop = event.clientY - offset.top;
         console.log("Left and top mousedown: " + startLeft + ", " + startTop);
-        coordinates.push({ startX: startLeft, startY: startTop });
+        coordinatesMoveTo.push({ startX: startLeft, startY: startTop });
         $("canvas").on("mousemove", (e) => {
             if (mouseDown) {
                 e.stopPropagation();
                 moveLeft = e.clientX - offset.left;
                 moveTop = e.clientY - offset.top;
-                coordinates.push({ x: moveLeft, y: moveTop });
+                coordinatesDrawing.push({ x: moveLeft, y: moveTop });
                 console.log(
                     "Left and top mousemove: " + moveLeft + ", " + moveTop
                 );
@@ -36,7 +37,8 @@
         event.stopPropagation();
         $("canvas").off("mousemove");
         console.log("A mouse went up, the magic ends!");
-        console.log("Coordinates: ", coordinates);
+        console.log("Coordinates mousedown: ", coordinatesMoveTo);
+        console.log("Coordinates mousemove: ", coordinatesDrawing);
     });
 
     requestAnimationFrame(drawSignature);
@@ -44,18 +46,29 @@
     function drawSignature() {
         // if there is no signing going on, politely request
         // an AnimationFrame and do nothing
-        if (coordinates.length == 0 || !mouseDown) {
+        if (coordinatesDrawing.length == 0 || !mouseDown) {
             requestAnimationFrame(drawSignature);
             return;
         }
         // if there is signing going on, animate the signing
         canvasContext.beginPath();
-        canvasContext.moveTo(coordinates[0].startX, coordinates[0].startY);
-        for (let i = 0; i < coordinates.length; i++) {
-            canvasContext.lineTo(coordinates[i].x, coordinates[i].y);
+        for (let i = 0; i < coordinatesMoveTo.length; i++) {
+            canvasContext.moveTo(
+                coordinatesMoveTo[0].startX,
+                coordinatesMoveTo[0].startY
+            );
+            for (let j = 0; j < coordinatesDrawing.length; j++) {
+                canvasContext.lineTo(
+                    coordinatesDrawing[j].x,
+                    coordinatesDrawing[j].y
+                );
+            }
+            if (!mouseDown) {
+                canvasContext.stroke();
+                canvasContext.closePath(); // somehow this doesn't work
+            }
         }
         canvasContext.stroke();
-        canvasContext.closePath(); // somehow this doesn't work
         requestAnimationFrame(drawSignature);
     }
 })();
