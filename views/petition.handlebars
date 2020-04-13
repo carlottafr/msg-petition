@@ -1,15 +1,17 @@
-<h1>Welcome to my Petition</h1>
-
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Id, accusamus iure. Quam, modi dolorem voluptatem inventore nostrum dolore, eligendi qui dolorum illum explicabo similique doloribus nemo? Ea omnis perspiciatis distinctio.</p>
+<div class="container">
+    {{> img}}
+<h1>Welcome to my Petition...</h1>
+<p>... to let the almighty Godzilla strike fear into the good people of Tokyo once again! Sign to support inviting Godzilla to the Olympic Games in 2021.<br />Let him do his thing!</p>
 
 {{#if error}}
 <h2>Oh no, something went wrong. Please try again!</h2>
 {{/if}}
-
+</div>
 <form method="POST">
     <input name="first" type="text" placeholder="First name" autocomplete="off">
     <input name="last" type="text" placeholder="Last name" autocomplete="off">
     <input type="hidden" name="signature" id="signature">
-    <canvas width="600px" height="100px" id="canvas"></canvas>
-    <button>Submit</button>
+    <p>Sign here:</p>
+    <canvas width="700px" height="100px" id="canvas"></canvas>
+    <button id="button">Submit</button>
 </form>

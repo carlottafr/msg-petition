@@ -23,7 +23,7 @@
                 top = event.clientY - offset.top;
                 canvasContext.lineTo(left, top);
                 canvasContext.stroke();
-                dataURL = canvas[0].toDataURL("text");
+                dataURL = canvas[0].toDataURL();
                 $("#signature").val(dataURL);
             }
         });
@@ -31,6 +31,6 @@
     $("body").on("mouseup", (event) => {
         mouseDown = false;
         event.stopPropagation();
-        console.log("This is the dataURL: ", dataURL);
+        // console.log("This is the dataURL: ", dataURL);
     });
 })();
