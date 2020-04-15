@@ -1,0 +1,18 @@
+<div class="container">
+    {{> img}}
+    <h1>Make Godzilla Feared Again</h1>
+</div>
+
+<h2>Please log in to support the petition</h2>
+
+{{#if error}}
+    <div id="error"><h3>⛔️ Please enter your correct email address / password</h3></div>
+    {{/if}}
+
+    <form method="POST">
+        <input name="email" type="text" placeholder="Email address" autocomplete="off">
+        <input name="pw" type="password" placeholder="Password" autocomplete="off">
+        <!-- Always add the following line when using CSRF middleware -->
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button>Login</button>
+    </form>

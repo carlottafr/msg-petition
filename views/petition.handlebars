@@ -2,16 +2,17 @@
     {{> img}}
 <h1>Welcome to my Petition...</h1>
 <p>... to let the almighty Godzilla strike fear into the good people of Tokyo once again! Sign to support inviting Godzilla to the Olympic Games in 2021.<br />Let him do his thing!</p>
+</div>
 
 {{#if error}}
-<h2>Oh no, something went wrong. Please try again!</h2>
+    <div id="error"><h3>⛔️ Oh no, something went wrong. Please try again!</h3></div> 
 {{/if}}
-</div>
-<form method="POST">
-    <input name="first" type="text" placeholder="First name" autocomplete="off">
-    <input name="last" type="text" placeholder="Last name" autocomplete="off">
+
+<form method="POST" class="signform">
     <input type="hidden" name="signature" id="signature">
+    <!-- Always add the following line when using CSRF middleware -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <p>Sign here:</p>
-    <canvas width="700px" height="100px" id="canvas"></canvas>
-    <button id="button">Submit</button>
+    <canvas width="700px" height="100px"></canvas>
+    <button>Submit</button>
 </form>
