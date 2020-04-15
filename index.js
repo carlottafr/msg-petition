@@ -53,8 +53,8 @@ app.get("/", (req, res) => {
     // req.session.msg = "bigSecret99";
     // req.session.permission = true;
     // console.log("Session cookie after value is set: ", req.session);
-    const { userId } = req.session;
-    if (userId) {
+    const { user } = req.session;
+    if (user) {
         res.redirect("/petition");
     } else {
         res.redirect("/register");
@@ -64,7 +64,12 @@ app.get("/", (req, res) => {
 // GET /register
 
 app.get("/register", (req, res) => {
-    res.render("register");
+    const { user } = req.session;
+    if (user) {
+        res.redirect("/petition");
+    } else {
+        res.render("register");
+    }
 });
 
 // POST /register
@@ -82,7 +87,15 @@ app.post("/register", (req, res) => {
             })
             .then((result) => {
                 // set the user ID as a cookie
-                req.session.userId = result.rows[0].id;
+                console.log("This is the result: ", result.rows[0].id);
+                req.session.user = {
+                    firstName: first,
+                    lastName: last,
+                    userId: result.rows[0].id,
+                };
+                console.log(
+                    `${req.session.user.firstName} ${req.session.user.lastName} has the ID: ${req.session.user.userId}`
+                );
                 res.redirect("/petition");
             })
             .catch((err) => {
@@ -106,7 +119,12 @@ app.post("/register", (req, res) => {
 // GET /login
 
 app.get("/login", (req, res) => {
-    res.render("login");
+    const { user } = req.session;
+    if (user) {
+        res.redirect("/petition");
+    } else {
+        res.render("login");
+    }
 });
 
 // POST /login
@@ -116,6 +134,7 @@ app.post("/login", (req, res) => {
     let password = req.body.pw;
     let dbPw;
     let id;
+    const { user } = req.session;
     db.checkLogin(email)
         .then((result) => {
             // console.log("The checkLogin result: ", result);
@@ -128,10 +147,10 @@ app.post("/login", (req, res) => {
         })
         .then((matchValue) => {
             if (matchValue) {
-                req.session.userId = id;
+                user.userId = id;
                 console.log(
                     "This is the current user ID cookie: ",
-                    req.session.userId
+                    user.userId
                 );
                 res.redirect("/petition");
             } else if (!matchValue) {
@@ -148,8 +167,8 @@ app.post("/login", (req, res) => {
 
 app.get("/petition", (req, res) => {
     // check for signature ID cookie
-    const { id } = req.session;
-    if (id) {
+    const { user } = req.session;
+    if (user.sigId) {
         res.redirect("/thanks");
     } else {
         res.render("petition");
@@ -161,14 +180,15 @@ app.get("/petition", (req, res) => {
 app.post("/petition", (req, res) => {
     // parsed input values
     let signature = req.body.signature;
-    let userId = req.session.userId;
+    let { user } = req.session;
     if (signature != "") {
         // insert the data as values in my signatures table
-        db.signSupport(signature, userId)
+        db.signSupport(signature, user.userId)
             .then((result) => {
                 // console.log("That worked, here is the ID: ", result.rows[0].id);
                 // set ID cookie
-                req.session.id = result.rows[0].id;
+                user.sigId = result.rows[0].id;
+                console.log("This is the session cookie: ", user);
                 res.redirect("/thanks");
             })
             .catch((err) => {
@@ -189,9 +209,9 @@ app.post("/petition", (req, res) => {
 
 app.get("/thanks", (req, res) => {
     // if a cookie is set, render with total number of supporters
-    const { id } = req.session;
+    const { user } = req.session;
     let supportNumbers;
-    if (id) {
+    if (user.sigId) {
         db.countSupports()
             .then((result) => {
                 // console.log("Supporters have been counted: ", result);
@@ -200,9 +220,11 @@ app.get("/thanks", (req, res) => {
             .catch((err) => {
                 console.log("Error in countSupports: ", err);
             });
-        db.getSignature(id)
+        db.getSignature(user.sigId)
             .then((result) => {
                 res.render("thanks", {
+                    first: user.firstName,
+                    last: user.lastName,
                     signature: result,
                     number: supportNumbers,
                 });
