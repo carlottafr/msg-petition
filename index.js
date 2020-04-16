@@ -119,12 +119,12 @@ app.post("/register", (req, res) => {
 // GET /profile
 
 app.get("/profile", (req, res) => {
-    // const { user } = req.session;
-    // if (user) {
-    res.render("profile");
-    // } else {
-    //     res.redirect("/register");
-    // }
+    const { user } = req.session;
+    if (user) {
+        res.render("profile");
+    } else {
+        res.redirect("/register");
+    }
 });
 
 // POST /profile
@@ -134,7 +134,11 @@ app.post("/profile", (req, res) => {
     const city = req.body.city;
     const url = req.body.homepage;
     const { user } = req.session;
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    if (
+        url != "" &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
         res.render("profile", { badUrl: true });
     } else {
         db.addProfileInfo(age, city, url, user.userId)
