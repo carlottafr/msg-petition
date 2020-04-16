@@ -1,0 +1,13 @@
+<div class="container">
+{{> img}}
+
+<h1>The wise supporters of this live-changing petition in {{place}}</h1>
+
+<p>Of course, the list is going to grow!</p>
+
+</div>
+<div class="signers">
+{{#citySupporters}}
+<div><a href="{{user_url}}" target="_blank">{{user_firstname}} {{user_lastname}}</a>, {{user_age}}</div>
+{{/citySupporters}}
+</div>

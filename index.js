@@ -277,7 +277,6 @@ app.get("/signers", (req, res) => {
     if (user) {
         db.getSupporters()
             .then((result) => {
-                console.log("This is the current result: ", result);
                 return result.rows;
             })
             .then((results) => {
@@ -289,6 +288,28 @@ app.get("/signers", (req, res) => {
         // if not, redirect
     } else {
         res.redirect("/petition");
+    }
+});
+
+// GET /signers/city
+
+app.get("/signers/:city", (req, res) => {
+    const { user } = req.session;
+    // if a cookie is set, render
+    if (user) {
+        const city = req.params.city;
+        db.supportersCity(city)
+            .then((result) => {
+                return result.rows;
+            })
+            .then((results) => {
+                res.render("city", { place: city, citySupporters: results });
+            })
+            .catch((err) => {
+                console.log("Error in supportersCity: ", err);
+            });
+    } else {
+        res.redirect("/register");
     }
 });
 

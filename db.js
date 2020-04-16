@@ -52,3 +52,18 @@ module.exports.getSupporters = () => {
         ON user_profiles.user_id = signatures.user_id;
     `);
 };
+
+module.exports.supportersCity = (city) => {
+    return db.query(
+        `
+        SELECT users.first AS user_firstName, users.last AS user_lastName, user_profiles.age AS user_age, user_profiles.city AS user_city, user_profiles.url AS user_url
+        FROM users
+        JOIN user_profiles
+        ON users.id = user_profiles.user_id
+        JOIN signatures
+        ON user_profiles.user_id = signatures.user_id
+        WHERE LOWER(user_profiles.city) = LOWER($1);
+        `,
+        [city]
+    );
+};
