@@ -96,7 +96,7 @@ app.post("/register", (req, res) => {
                 console.log(
                     `${req.session.user.firstName} ${req.session.user.lastName} has the ID: ${req.session.user.userId}`
                 );
-                res.redirect("/petition");
+                res.redirect("/profile");
             })
             .catch((err) => {
                 console.log("Error in registerAccount: ", err);
@@ -113,6 +113,38 @@ app.post("/register", (req, res) => {
     ) {
         // render the register template with error helper
         res.render("register", { error: true });
+    }
+});
+
+// GET /profile
+
+app.get("/profile", (req, res) => {
+    // const { user } = req.session;
+    // if (user) {
+    res.render("profile");
+    // } else {
+    //     res.redirect("/register");
+    // }
+});
+
+// POST /profile
+
+app.post("/profile", (req, res) => {
+    const age = req.body.age;
+    const city = req.body.city;
+    const url = req.body.homepage;
+    const { user } = req.session;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        res.render("profile", { badUrl: true });
+    } else {
+        db.addProfileInfo(age, city, url, user.userId)
+            .then(() => {
+                res.redirect("/petition");
+            })
+            .catch((err) => {
+                console.log("Error in addProfileInfo: ", err);
+                res.render("profile", { error: true });
+            });
     }
 });
 
@@ -241,10 +273,11 @@ app.get("/thanks", (req, res) => {
 
 app.get("/signers", (req, res) => {
     // if a cookie is set, render
-    const { id } = req.session;
-    if (id) {
+    const { user } = req.session;
+    if (user) {
         db.getSupporters()
             .then((result) => {
+                console.log("This is the current result: ", result);
                 return result.rows;
             })
             .then((results) => {

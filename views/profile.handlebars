@@ -1,0 +1,22 @@
+<div class="container">
+    {{> img}}
+    <h1>Make Godzilla Feared Again</h1>
+</div>
+<h2>Thank you for registering &ndash; you may now add additional info below</h2>
+
+{{#if error}}
+    <div id="error"><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
+{{/if}}
+
+{{#if badUrl}}
+    <div id="error"><h3>⛔️ Please start your homepage link with either <em>http://</em> or <em>https://</em> &ndash; or leave the field empty!</h3></div>
+{{/if}}
+
+    <form method="POST">
+        <input name="age" type="text" placeholder="Age" autocomplete="off">
+        <input name="city" type="text" placeholder="City" autocomplete="off">
+        <input name="homepage" type="text" placeholder="Homepage" autocomplete="off">
+        <!-- Always add the following line when using CSRF middleware -->
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button id="button">Submit</button>
+    </form>
