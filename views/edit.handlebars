@@ -8,13 +8,13 @@
 </div>
 
 <form method="POST">
-        <input name="first" type="text" label="First name" autocomplete="off" value="{{user_firstname}}">
-        <input name="last" type="text" label="Last name" autocomplete="off" value="{{user_lastname}}">
-        <input name="email" type="email" label="Email address" autocomplete="off" value="{{user_email}}">
+        <input name="first" type="text" label="First name" autocomplete="off" value="{{first}}">
+        <input name="last" type="text" label="Last name" autocomplete="off" value="{{last}}">
+        <input name="email" type="email" label="Email address" autocomplete="off" value="{{email}}">
         <input name="pw" type="password" label="Password" autocomplete="off">
-        <input name="age" type="number" label="Age" autocomplete="off" value="{{user_age}}">
-        <input name="city" type="text" label="City" autocomplete="off" value="{{user_city}}">
-        <input name="homepage" type="text" label="Homepage" autocomplete="off" value="{{user_url}}">
+        <input name="age" type="number" label="Age" autocomplete="off" value="{{age}}">
+        <input name="city" type="text" label="City" autocomplete="off" value="{{city}}">
+        <input name="homepage" type="text" label="Homepage" autocomplete="off" value="{{url}}">
         <!-- Always add the following line when using CSRF middleware -->
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button>Update</button>

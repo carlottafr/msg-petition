@@ -1,7 +1,10 @@
 const spicedPg = require("spiced-pg");
-var db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+const db = spicedPg(
+    process.env.DATABASE_URL ||
+        "postgres:postgres:postgres@localhost:5432/petition"
+);
 // ^ returns an object with one method: .query
-// .query("SQL query string").then(function(result) {}).catch(function(err) {blabla});
+// .query("SQL query string").then(function(result) {}).catch(function(err) {err});
 
 module.exports.registerAccount = (first, last, email, password) => {
     return db.query(
@@ -46,9 +49,20 @@ module.exports.countSupports = () => {
     });
 };
 
+module.exports.displayInfo = (user_id) => {
+    return db.query(
+        `SELECT users.first AS user_firstname, users.last AS user_lastname, users.email AS user_email, user_profiles.age AS user_age, user_profiles.city AS user_city, user_profiles.url AS user_url
+        FROM users
+        LEFT JOIN user_profiles
+        ON users.id = user_profiles.user_id
+        WHERE users.id = $1;`,
+        [user_id]
+    );
+};
+
 module.exports.getSupporters = () => {
     return db.query(`
-        SELECT users.first AS user_firstName, users.last AS user_lastName, user_profiles.age AS user_age, user_profiles.city AS user_city, user_profiles.url AS user_url
+        SELECT users.first AS first, users.last AS last, user_profiles.age AS age, user_profiles.city AS city, user_profiles.url AS url
         FROM users
         JOIN user_profiles
         ON users.id = user_profiles.user_id

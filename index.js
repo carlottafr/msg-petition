@@ -286,6 +286,22 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+app.get("/profile/edit", (req, res) => {
+    const { user } = req.session;
+    db.displayInfo(user.userId).then((result) => {
+        let profile = result.rows;
+        console.log("This is the result of displayInfo: ", result.rows);
+        res.render("edit", {
+            first: profile[0].first,
+            last: profile[0].last,
+            email: profile[0].email,
+            age: profile[0].age,
+            city: profile[0].city,
+            url: profile[0].url,
+        });
+    });
+});
+
 app.post("/thanks/delete", (req, res) => {
     const { user } = req.session;
     db.deleteSignature(user.userId)
@@ -347,4 +363,6 @@ app.get("/logout", (req, res) => {
     res.redirect("/login");
 });
 
-app.listen(8080, () => console.log("Express server is at your service."));
+app.listen(process.env.PORT || 8080, () =>
+    console.log("Express server is at your service.")
+);
