@@ -133,6 +133,10 @@ footer {
     margin: 0 auto;
 }
 
+.container #success {
+    border: 1px solid green;
+}
+
 .container p {
     grid-row: 4;
     padding-top: 20px;

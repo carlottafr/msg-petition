@@ -60,6 +60,27 @@ module.exports.displayInfo = (user_id) => {
     );
 };
 
+module.exports.updateAccountNoPw = (first, last, email, id) => {
+    return db.query(
+        `UPDATE users SET first = $1, last = $2, email = $3 WHERE id = $4;`,
+        [first, last, email, id]
+    );
+};
+
+module.exports.updateFullAccount = (first, last, email, password, id) => {
+    return db.query(
+        `UPDATE users SET first = $1, last = $2, email = $3, password = $4 WHERE id = $5;`,
+        [first, last, email, password, id]
+    );
+};
+
+module.exports.upsertProfileInfo = (age, city, url, user_id) => {
+    return db.query(
+        `INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET age = $1, city = $2, url = $3;`,
+        [age, city, url, user_id]
+    );
+};
+
 module.exports.getSupporters = () => {
     return db.query(`
         SELECT users.first AS first, users.last AS last, user_profiles.age AS age, user_profiles.city AS city, user_profiles.url AS url

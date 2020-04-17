@@ -4,17 +4,29 @@
     {{#if error}}
     <div><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
     {{/if}}
+
+    {{#if badUrl}}
+    <div id="error"><h3>⛔️ Please start your homepage link with either <em>http://</em> or <em>https://</em> &ndash; or leave the field empty!</h3></div>
+    {{/if}}
+
     <p>Please enter any new info and hit the update button.</a></p>
 </div>
 
-<form method="POST">
-        <input name="first" type="text" label="First name" autocomplete="off" value="{{first}}">
-        <input name="last" type="text" label="Last name" autocomplete="off" value="{{last}}">
-        <input name="email" type="email" label="Email address" autocomplete="off" value="{{email}}">
-        <input name="pw" type="password" label="Password" autocomplete="off">
-        <input name="age" type="number" label="Age" autocomplete="off" value="{{age}}">
-        <input name="city" type="text" label="City" autocomplete="off" value="{{city}}">
-        <input name="homepage" type="text" label="Homepage" autocomplete="off" value="{{url}}">
+<form method="POST" class="edit">
+        <label for="first">First name:</label>
+        <input name="first" type="text" autocomplete="off" value={{first}}>
+        <label for="last">Last name:</label>
+        <input name="last" type="text" autocomplete="off" value={{last}}>
+        <label for="email">E-mail address:</label>
+        <input name="email" type="email" autocomplete="off" value={{email}}>
+        <label for="pw">Password:</label>
+        <input name="pw" type="password" autocomplete="off">
+        <label for="age">Age:</label>
+        <input name="age" type="number" autocomplete="off" value={{age}}>
+        <label for="city">City:</label>
+        <input name="city" type="text" autocomplete="off" value={{city}}>
+        <label for="url">Homepage:</label>
+        <input name="url" type="text" autocomplete="off" value={{url}}>
         <!-- Always add the following line when using CSRF middleware -->
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button>Update</button>

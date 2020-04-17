@@ -8,7 +8,7 @@
 </div>
 <div class="signers">
 {{#supporters}}
-<div><p><a href="{{user_url}}" target="_blank">{{user_firstname}} {{user_lastname}}</a>, {{user_age}}, <a href="/signers/{{user_city}}">{{user_city}}</a></p></div>
+<div><p>{{#if this.url}}<a href="{{url}}" target="_blank">{{/if}}{{first}} {{last}}{{#if this.url}}</a>{{/if}}, {{age}}, <a href="/signers/{{city}}">{{city}}</a></p></div>
 {{/supporters}}
 </div>
 {{> nav}}

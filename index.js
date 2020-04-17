@@ -48,11 +48,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// GET /
+
 app.get("/", (req, res) => {
-    // console.log("Session cookie when first created: ", req.session);
-    // req.session.msg = "bigSecret99";
-    // req.session.permission = true;
-    // console.log("Session cookie after value is set: ", req.session);
+    // check for a cookie and respond accordingly
     const { user } = req.session;
     if (user) {
         res.redirect("/petition");
@@ -75,10 +74,7 @@ app.get("/register", (req, res) => {
 // POST /register
 
 app.post("/register", (req, res) => {
-    let first = req.body.first;
-    let last = req.body.last;
-    let email = req.body.email;
-    let password = req.body.pw;
+    let { first, last, email, password } = req.body;
     // check if all input fields have been filled
     if (first != "" && last != "" && email != "" && password != "") {
         hash(password)
@@ -86,16 +82,13 @@ app.post("/register", (req, res) => {
                 return db.registerAccount(first, last, email, hashedPw);
             })
             .then((result) => {
-                // set the user ID as a cookie
-                console.log("This is the result: ", result.rows[0].id);
+                // create user-object as cookie
+                // including user ID and full name
                 req.session.user = {
                     firstName: first,
                     lastName: last,
                     userId: result.rows[0].id,
                 };
-                console.log(
-                    `${req.session.user.firstName} ${req.session.user.lastName} has the ID: ${req.session.user.userId}`
-                );
                 res.redirect("/profile");
             })
             .catch((err) => {
@@ -103,8 +96,6 @@ app.post("/register", (req, res) => {
                 res.render("register", { error: true });
             });
     } else if (
-        // there is either an error or
-        req.statusCode != 200 ||
         // the values are empty
         first == "" ||
         last == "" ||
@@ -119,6 +110,7 @@ app.post("/register", (req, res) => {
 // GET /profile
 
 app.get("/profile", (req, res) => {
+    // the good old cookie spiel
     const { user } = req.session;
     if (user) {
         res.render("profile");
@@ -130,16 +122,19 @@ app.get("/profile", (req, res) => {
 // POST /profile
 
 app.post("/profile", (req, res) => {
-    const age = req.body.age;
-    const city = req.body.city;
-    const url = req.body.homepage;
+    let { age, city, url } = req.body;
     const { user } = req.session;
+    // check for bad URL
     if (
         url != "" &&
         !url.startsWith("http://") &&
         !url.startsWith("https://")
     ) {
         res.render("profile", { badUrl: true });
+    } else if (age == "" && city == "" && url == "") {
+        // if the user has not entered anything,
+        // redirect to petition
+        res.redirect("/petition");
     } else {
         db.addProfileInfo(age, city, url, user.userId)
             .then(() => {
@@ -166,26 +161,27 @@ app.get("/login", (req, res) => {
 // POST /login
 
 app.post("/login", (req, res) => {
-    let first;
-    let last;
+    let first, last, databasePw, id;
     let email = req.body.email;
-    let password = req.body.pw;
-    let dbPw;
-    let id;
+    let inputPw = req.body.pw;
     db.checkLogin(email)
         .then((result) => {
-            console.log("The checkLogin result: ", result);
+            // get the full name, password and ID
+            // from the database and store them
             first = result.rows[0].first;
             last = result.rows[0].last;
-            dbPw = result.rows[0].password;
+            databasePw = result.rows[0].password;
             id = result.rows[0].id;
-            return dbPw;
+            return databasePw;
         })
-        .then((dbPw) => {
-            return compare(password, dbPw);
+        .then((databasePw) => {
+            return compare(inputPw, databasePw);
         })
         .then((matchValue) => {
             if (matchValue) {
+                // create user cookie object and
+                // give it the full name and user
+                // ID stored from checkLogin
                 req.session.user = {
                     firstName: first,
                     lastName: last,
@@ -197,8 +193,10 @@ app.post("/login", (req, res) => {
             }
         })
         .then((userId) => {
+            // check for signature with user ID
             db.checkSignature(userId).then((sigId) => {
                 if (sigId.rows[0].id) {
+                    // store the signature ID in the cookie
                     req.session.user.sigId = sigId.rows[0].id;
                     res.redirect("/thanks");
                 } else if (!sigId.rows[0].id) {
@@ -257,13 +255,12 @@ app.post("/petition", (req, res) => {
 // GET /thanks
 
 app.get("/thanks", (req, res) => {
-    // if a cookie is set, render with total number of supporters
+    // if a signature ID cookie is set, render with total number of supporters
     const { user } = req.session;
     let supportNumbers;
     if (user.sigId) {
         db.countSupports()
             .then((result) => {
-                // console.log("Supporters have been counted: ", result);
                 supportNumbers = result;
             })
             .catch((err) => {
@@ -271,12 +268,29 @@ app.get("/thanks", (req, res) => {
             });
         db.getSignature(user.sigId)
             .then((result) => {
-                res.render("thanks", {
-                    first: user.firstName,
-                    last: user.lastName,
-                    signature: result,
-                    number: supportNumbers,
-                });
+                // check for the cookie set after
+                // profile/edit
+                if (user.edit) {
+                    // delete the edit cookie
+                    delete user.edit;
+                    // render the thanks template
+                    // with success message
+                    res.render("thanks", {
+                        first: user.firstName,
+                        last: user.lastName,
+                        signature: result,
+                        number: supportNumbers,
+                        update: true,
+                    });
+                } else {
+                    // normal thanks render
+                    res.render("thanks", {
+                        first: user.firstName,
+                        last: user.lastName,
+                        signature: result,
+                        number: supportNumbers,
+                    });
+                }
             })
             .catch((err) => {
                 console.log("Error in getSignature: ", err);
@@ -286,26 +300,141 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+// GET /profile/edit
+
 app.get("/profile/edit", (req, res) => {
     const { user } = req.session;
     db.displayInfo(user.userId).then((result) => {
         let profile = result.rows;
-        console.log("This is the result of displayInfo: ", result.rows);
         res.render("edit", {
-            first: profile[0].first,
-            last: profile[0].last,
-            email: profile[0].email,
-            age: profile[0].age,
-            city: profile[0].city,
-            url: profile[0].url,
+            first: profile[0].user_firstname,
+            last: profile[0].user_lastname,
+            email: profile[0].user_email,
+            age: profile[0].user_age,
+            city: profile[0].user_city,
+            url: profile[0].user_url,
         });
     });
 });
+
+// POST /profile/edit
+// brace yourselves...
+
+app.post("/profile/edit", (req, res) => {
+    let { first, last, email, pw, age, city, url } = req.body;
+    const { user } = req.session;
+    // check for bad URL
+    if (
+        url != "" &&
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
+        // if there is one, rerender
+        // the page with all info and
+        // the bad URL warning
+        db.displayInfo(user.userId)
+            .then((result) => {
+                let profile = result.rows;
+                res.render("edit", {
+                    first: profile[0].user_firstname,
+                    last: profile[0].user_lastname,
+                    email: profile[0].user_email,
+                    age: profile[0].user_age,
+                    city: profile[0].user_city,
+                    url: profile[0].user_url,
+                    badUrl: true,
+                });
+            })
+            .catch((err) => {
+                console.log("Error in re-rendering after badUrl: ", err);
+            });
+    } else if (pw != "") {
+        // if there is an entered password,
+        // bring out the big gears with a
+        // full-on account update/upsert
+        hash(pw).then((hashedPw) => {
+            Promise.all([
+                db.updateFullAccount(first, last, email, hashedPw, user.userId),
+                db.upsertProfileInfo(age, city, url, user.userId),
+            ])
+                .then(() => {
+                    // set a cookie for a success message
+                    // on GET /thanks
+                    // update the name in the cookie
+                    user.edit = true;
+                    user.firstName = first;
+                    user.lastName = last;
+                    res.redirect("/thanks");
+                })
+                .catch((err) => {
+                    console.log("Error in full update: ", err);
+                    // if there is an error, rerender the page
+                    // with all existing info + error msg
+                    db.displayInfo(user.userId)
+                        .then((result) => {
+                            let profile = result.rows;
+                            res.render("edit", {
+                                first: profile[0].user_firstname,
+                                last: profile[0].user_lastname,
+                                email: profile[0].user_email,
+                                age: profile[0].user_age,
+                                city: profile[0].user_city,
+                                url: profile[0].user_url,
+                                error: true,
+                            });
+                        })
+                        .catch((err) => {
+                            console.log("Error in re-rendering /thanks: ", err);
+                        });
+                });
+        });
+    } else {
+        // if there is no new password,
+        // make a small-scale update
+        Promise.all([
+            db.updateAccountNoPw(first, last, email, user.userId),
+            db.upsertProfileInfo(age, city, url, user.userId),
+        ])
+            .then(() => {
+                // set a cookie for a success message
+                // on GET /thanks
+                // update the name in the cookie
+                user.edit = true;
+                user.firstName = first;
+                user.lastName = last;
+                res.redirect("/thanks");
+            })
+            .catch((err) => {
+                console.log("Error in partial update: ", err);
+                // if there is an error, rerender the page
+                // with all existing info + error msg
+                db.displayInfo(user.userId)
+                    .then((result) => {
+                        let profile = result.rows;
+                        res.render("edit", {
+                            first: profile[0].user_firstname,
+                            last: profile[0].user_lastname,
+                            email: profile[0].user_email,
+                            age: profile[0].user_age,
+                            city: profile[0].user_city,
+                            url: profile[0].user_url,
+                            error: true,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log("Error in re-rendering /thanks: ", err);
+                    });
+            });
+    }
+});
+
+// POST /thanks/delete
 
 app.post("/thanks/delete", (req, res) => {
     const { user } = req.session;
     db.deleteSignature(user.userId)
         .then(() => {
+            // delete signature ID cookie
             delete user.sigId;
             res.redirect("/petition");
         })
@@ -320,19 +449,25 @@ app.get("/signers", (req, res) => {
     // if a cookie is set, render
     const { user } = req.session;
     if (user) {
-        db.getSupporters()
-            .then((result) => {
-                return result.rows;
-            })
-            .then((results) => {
-                res.render("signers", { supporters: results });
-            })
-            .catch((err) => {
-                console.log("Error in getSupporters: ", err);
-            });
-        // if not, redirect
+        // check for signature
+        if (user.sigId) {
+            db.getSupporters()
+                .then((result) => {
+                    return result.rows;
+                })
+                .then((results) => {
+                    res.render("signers", { supporters: results });
+                })
+                .catch((err) => {
+                    console.log("Error in getSupporters: ", err);
+                });
+        } else {
+            // if no signature, back to signing!
+            res.redirect("/petition");
+        }
+        // if no user cookie, back to registering
     } else {
-        res.redirect("/petition");
+        res.redirect("/register");
     }
 });
 
@@ -358,10 +493,14 @@ app.get("/signers/:city", (req, res) => {
     }
 });
 
+// GET /logout
+
 app.get("/logout", (req, res) => {
     req.session = null;
     res.redirect("/login");
 });
+
+// server set-up: Heroku & local
 
 app.listen(process.env.PORT || 8080, () =>
     console.log("Express server is at your service.")
