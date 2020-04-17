@@ -18,7 +18,11 @@ module.exports.addProfileInfo = (age, city, url, userId) => {
 };
 
 module.exports.checkLogin = (email) => {
-    return db.query(`SELECT * FROM users WHERE email = '$1';`, [email]);
+    return db.query(`SELECT * FROM users WHERE email = $1;`, [email]);
+};
+
+module.exports.checkSignature = (id) => {
+    return db.query(`SELECT id FROM signatures WHERE user_id = $1;`, [id]);
 };
 
 module.exports.signSupport = (signature, user_id) => {
@@ -30,14 +34,14 @@ module.exports.signSupport = (signature, user_id) => {
 
 module.exports.getSignature = (id) => {
     return db
-        .query(`SELECT signature FROM signatures WHERE id=$1;`, [id])
+        .query(`SELECT signature FROM signatures WHERE id = $1;`, [id])
         .then((result) => {
             return result.rows[0].signature;
         });
 };
 
 module.exports.countSupports = () => {
-    return db.query(`SELECT COUNT(*) FROM signatures`).then((results) => {
+    return db.query(`SELECT COUNT(*) FROM signatures;`).then((results) => {
         return results.rows[0].count;
     });
 };
@@ -66,4 +70,8 @@ module.exports.supportersCity = (city) => {
         `,
         [city]
     );
+};
+
+module.exports.deleteSignature = (user_id) => {
+    return db.query(`DELETE FROM signatures WHERE user_id = $1;`, [user_id]);
 };

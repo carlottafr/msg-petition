@@ -1,0 +1,22 @@
+<div class="container">
+    {{> img}}
+    <h1>Make Godzilla Feared Again</h1>
+    {{#if error}}
+    <div><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
+    {{/if}}
+    <p>Please enter any new info and hit the update button.</a></p>
+</div>
+
+<form method="POST">
+        <input name="first" type="text" label="First name" autocomplete="off" value="{{user_firstname}}">
+        <input name="last" type="text" label="Last name" autocomplete="off" value="{{user_lastname}}">
+        <input name="email" type="email" label="Email address" autocomplete="off" value="{{user_email}}">
+        <input name="pw" type="password" label="Password" autocomplete="off">
+        <input name="age" type="number" label="Age" autocomplete="off" value="{{user_age}}">
+        <input name="city" type="text" label="City" autocomplete="off" value="{{user_city}}">
+        <input name="homepage" type="text" label="Homepage" autocomplete="off" value="{{user_url}}">
+        <!-- Always add the following line when using CSRF middleware -->
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button>Update</button>
+</form>
+{{> nav}}

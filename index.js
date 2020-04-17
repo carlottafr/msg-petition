@@ -166,14 +166,17 @@ app.get("/login", (req, res) => {
 // POST /login
 
 app.post("/login", (req, res) => {
+    let first;
+    let last;
     let email = req.body.email;
     let password = req.body.pw;
     let dbPw;
     let id;
-    const { user } = req.session;
     db.checkLogin(email)
         .then((result) => {
-            // console.log("The checkLogin result: ", result);
+            console.log("The checkLogin result: ", result);
+            first = result.rows[0].first;
+            last = result.rows[0].last;
             dbPw = result.rows[0].password;
             id = result.rows[0].id;
             return dbPw;
@@ -183,15 +186,25 @@ app.post("/login", (req, res) => {
         })
         .then((matchValue) => {
             if (matchValue) {
-                user.userId = id;
-                console.log(
-                    "This is the current user ID cookie: ",
-                    user.userId
-                );
-                res.redirect("/petition");
+                req.session.user = {
+                    firstName: first,
+                    lastName: last,
+                    userId: id,
+                };
+                return req.session.user.userId;
             } else if (!matchValue) {
                 res.render("login", { error: true });
             }
+        })
+        .then((userId) => {
+            db.checkSignature(userId).then((sigId) => {
+                if (sigId.rows[0].id) {
+                    req.session.user.sigId = sigId.rows[0].id;
+                    res.redirect("/thanks");
+                } else if (!sigId.rows[0].id) {
+                    res.redirect("/petition");
+                }
+            });
         })
         .catch((err) => {
             console.log("Error in checkLogin: ", err);
@@ -216,7 +229,7 @@ app.get("/petition", (req, res) => {
 app.post("/petition", (req, res) => {
     // parsed input values
     let signature = req.body.signature;
-    let { user } = req.session;
+    const { user } = req.session;
     if (signature != "") {
         // insert the data as values in my signatures table
         db.signSupport(signature, user.userId)
@@ -273,6 +286,18 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+app.post("/thanks/delete", (req, res) => {
+    const { user } = req.session;
+    db.deleteSignature(user.userId)
+        .then(() => {
+            delete user.sigId;
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("Error in deleteSignature: ", err);
+        });
+});
+
 // GET /signers
 
 app.get("/signers", (req, res) => {
@@ -315,6 +340,11 @@ app.get("/signers/:city", (req, res) => {
     } else {
         res.redirect("/register");
     }
+});
+
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/login");
 });
 
 app.listen(8080, () => console.log("Express server is at your service."));

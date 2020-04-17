@@ -138,6 +138,19 @@ footer {
     padding-top: 20px;
 }
 
+.nav {
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.nav div {
+    margin: 10px;
+    font-size: 12px;
+}
+
 .signers {
     margin-top: 30px;
 }
@@ -179,6 +192,14 @@ footer {
     justify-content: center;
     align-items: center;
     margin-top: 20px;
+}
+
+#delete {
+    border: none;
+    width: auto;
+    text-decoration: underline;
+    background: #424242;
+    box-shadow: none;
 }
 
 #signature {

@@ -1,8 +1,9 @@
 <div class="container">
     {{> img}}
+{{!-- <h1>Make Godzilla Feared Again</h1> --}}
 <h1>Thank you for your sacrific- uuh, signature, {{first}} {{last}}!</h1>
 
-<p>Check out the other {{number}} wise people who have signed <a href="/signers">right here</a>!</p>
+<p>Check out the other {{number}} wise people who have signed <a href="/signers">right here</a></p>
 
 </div>
 <div class="wrapper">
@@ -10,5 +11,10 @@
     <div id="signature">
         <img src="{{signature}}" />
     </div>
+    <form action="/thanks/delete" method="POST">
+        <button id="delete">Delete your signature<br />(but please reconsider, for Godzilla's sake 😔)</button>
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    </form>
 </div>
 <audio src="/submit.mp3" type="audio/mpeg" autoplay="autoplay"></audio>
+{{> nav}}
