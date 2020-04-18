@@ -7,7 +7,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     background-color: #424242;
-    height: 100vh;
+    /* height: 100vh; */
     position: relative;
 }
 
@@ -20,7 +20,8 @@ h1,
 h2,
 h3,
 p,
-footer {
+footer,
+.edit label {
     font-weight: 100;
 }
 
@@ -42,12 +43,17 @@ h3 {
     text-align: center;
 }
 
+h3 {
+    font-size: 16px;
+}
+
 p {
     font-size: 18px;
 }
 
 form {
-    margin-top: 10px;
+    grid-row: 5;
+    margin-top: 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -61,6 +67,14 @@ form input {
     background: rgba(0, 0, 0, 0.2);
     font-size: 20px;
     color: linen;
+}
+
+/* thanks to css-tricks for that one: */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 form input:focus {
@@ -88,7 +102,7 @@ button {
     height: 25px;
     grid-row: 4;
     grid-column: -3 / -2;
-    background: rgba(0, 0, 0, 0.3);
+    background: green;
     color: linen;
     font-size: 16px;
     cursor: pointer;
@@ -107,13 +121,13 @@ footer {
 .container {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 200px 50px 50px 20px;
+    grid-template-rows: 200px 55px 55px 35px 140px;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
-.container img {
+.container #godzilla {
     height: auto;
     width: 100%;
     background-size: contain;
@@ -124,7 +138,7 @@ footer {
     grid-row: 1;
 }
 
-.container div {
+#error {
     border: 1px solid yellow;
     padding: 5px;
     height: 50px;
@@ -133,30 +147,79 @@ footer {
     margin: 0 auto;
 }
 
-.container #success {
-    border: 1px solid green;
-}
-
 .container p {
     grid-row: 4;
-    padding-top: 20px;
+    /* padding-top: 10px; */
+}
+
+.edit {
+    grid-row: 5;
+    display: grid;
+    grid-template-columns: 300px 300px;
+    grid-template-rows: repeat(4, 40px);
+    justify-content: center;
+    margin-top: 40px;
+    margin-right: 50px;
+}
+
+.edit input {
+    width: 150px;
+    height: 30px;
+    margin: 5px;
+}
+
+.edit input,
+label {
+    font-size: 16px;
+}
+
+.edit input,
+.edit button {
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.edit button {
+    margin-left: 40px;
+}
+
+.edit label {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+}
+
+.edit .labelinput1 {
+    grid-row: 1;
+}
+
+.edit .labelinput2 {
+    grid-row: 2;
+}
+
+.edit .labelinput3 {
+    grid-row: 3;
+}
+
+.edit .labelinput4 {
+    grid-row: 4;
 }
 
 .nav {
     display: flex;
     flex-direction: row;
     position: fixed;
-    bottom: 0;
+    bottom: 10px;
     right: 0;
 }
 
 .nav div {
     margin: 10px;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 100;
 }
 
 .signers {
-    margin-top: 30px;
+    grid-row: 5;
 }
 
 .signers div {
@@ -178,11 +241,12 @@ footer {
 }
 
 .wrapper {
+    grid-row: 5;
     display: grid;
-    grid-template-rows: 20px 140px;
+    grid-template-rows: 30px 110px 30px;
     align-items: center;
     justify-content: center;
-    margin-top: 50px;
+    /* margin-top: 120px; */
 }
 
 .wrapper p {
@@ -198,16 +262,45 @@ footer {
     margin-top: 20px;
 }
 
+#signerslink {
+    margin-top: 250px;
+}
+
+#success {
+    border: 1px solid green;
+}
+
+#success,
+#success h3 {
+    -webkit-animation: dissolve 4s;
+    animation: dissolve 4s;
+    opacity: 0;
+}
+
+@keyframes dissolve {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
 #delete {
     border: none;
     width: auto;
     text-decoration: underline;
     background: #424242;
     box-shadow: none;
+    grid-row: 3;
+}
+
+#sigpic,
+#signature {
+    grid-row: 2;
 }
 
 #signature {
-    grid-row: 2;
     width: 700px;
     height: 100px;
     border: 3px dotted #0d0c1d;

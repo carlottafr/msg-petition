@@ -1,34 +1,48 @@
 <div class="container">
     {{> img}}
-    <h1>Make Godzilla Feared Again</h1>
+    <h1>Edit your profile</h1>
     {{#if error}}
-    <div><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
-    {{/if}}
-
-    {{#if badUrl}}
-    <div id="error"><h3>⛔️ Please start your homepage link with either <em>http://</em> or <em>https://</em> &ndash; or leave the field empty!</h3></div>
+    <div id="error"><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
     {{/if}}
 
     <p>Please enter any new info and hit the update button.</a></p>
+    <form method="POST" class="edit">
+        {{#result}}
+            <div class="labelinput1">
+                <label for="first">First name:</label>
+                <input name="first" type="text" autocomplete="off" value={{first}}>
+            </div>
+            <div class="labelinput1">
+                <label for="last">Last name:</label>
+            <input name="last" type="text" autocomplete="off" value={{last}}>
+            </div>
+            <div class="labelinput2">
+                <label for="email">E-mail:</label>
+            <input name="email" type="email" autocomplete="off" value={{email}}>
+            </div>
+            <div class="labelinput2">
+                <label for="pw">Password:</label>
+            <input name="pw" type="password" autocomplete="off">
+            </div>
+            <div class="labelinput3">
+                <label for="age">Age:</label>
+            <input name="age" type="number" autocomplete="off" value={{age}}>
+            </div>
+            <div class="labelinput3">
+                <label for="city">City:</label>
+            <input name="city" type="text" autocomplete="off" value={{city}}>
+            </div>
+            <div class="labelinput4">
+                <label for="url">Homepage:</label>
+            <input name="url" type="text" autocomplete="off" value={{url}}>
+            </div>
+            {{/result}}
+            <!-- Always add the following line when using CSRF middleware -->
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="labelinput4">
+                <button>Update</button>
+            </div>
+    </form>
 </div>
 
-<form method="POST" class="edit">
-        <label for="first">First name:</label>
-        <input name="first" type="text" autocomplete="off" value={{first}}>
-        <label for="last">Last name:</label>
-        <input name="last" type="text" autocomplete="off" value={{last}}>
-        <label for="email">E-mail address:</label>
-        <input name="email" type="email" autocomplete="off" value={{email}}>
-        <label for="pw">Password:</label>
-        <input name="pw" type="password" autocomplete="off">
-        <label for="age">Age:</label>
-        <input name="age" type="number" autocomplete="off" value={{age}}>
-        <label for="city">City:</label>
-        <input name="city" type="text" autocomplete="off" value={{city}}>
-        <label for="url">Homepage:</label>
-        <input name="url" type="text" autocomplete="off" value={{url}}>
-        <!-- Always add the following line when using CSRF middleware -->
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <button>Update</button>
-</form>
 {{> nav}}

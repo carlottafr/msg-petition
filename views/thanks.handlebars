@@ -7,18 +7,18 @@
     <div id="success"><h3>🎉 Your profile has been successfully updated 🎉</h3></div>
 {{/if}}
 
-<p>Check out the other {{number}} wise people who have signed <a href="/signers">right here</a></p>
 
-</div>
 <div class="wrapper">
     <p>This is your signature:</p>
     <div id="signature">
-        <img src="{{signature}}" />
+        <img src="{{signature}}" id="sigpic"/>
     </div>
     <form action="/thanks/delete" method="POST">
         <button id="delete">Delete your signature<br />(but please reconsider, for Godzilla's sake 😔)</button>
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </form>
+</div>
+<p id="signerslink">Check out the other {{number}} wise people who have signed <a href="/signers">right here</a></p>
 </div>
 <audio src="/submit.mp3" type="audio/mpeg" autoplay="autoplay"></audio>
 {{> nav}}

@@ -5,6 +5,7 @@ const db = spicedPg(
 );
 // ^ returns an object with one method: .query
 // .query("SQL query string").then(function(result) {}).catch(function(err) {err});
+const input = require("./input");
 
 module.exports.registerAccount = (first, last, email, password) => {
     return db.query(
@@ -13,10 +14,10 @@ module.exports.registerAccount = (first, last, email, password) => {
     );
 };
 
-module.exports.addProfileInfo = (age, city, url, userId) => {
+module.exports.addProfileInfo = (age, city, url, user_id) => {
     return db.query(
         `INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4);`,
-        [age, city, url, userId]
+        [input.checkAge(age), city, input.checkUrl(url), user_id]
     );
 };
 
@@ -50,14 +51,21 @@ module.exports.countSupports = () => {
 };
 
 module.exports.displayInfo = (user_id) => {
-    return db.query(
-        `SELECT users.first AS user_firstname, users.last AS user_lastname, users.email AS user_email, user_profiles.age AS user_age, user_profiles.city AS user_city, user_profiles.url AS user_url
+    return db
+        .query(
+            `SELECT users.first AS user_firstname, users.last AS user_lastname, users.email AS user_email, user_profiles.age AS user_age, user_profiles.city AS user_city, user_profiles.url AS user_url
         FROM users
         LEFT JOIN user_profiles
         ON users.id = user_profiles.user_id
         WHERE users.id = $1;`,
-        [user_id]
-    );
+            [user_id]
+        )
+        .then((result) => {
+            return input.displayData(result.rows);
+        })
+        .catch((err) => {
+            console.log("Error in displayInfo in db.js: ", err);
+        });
 };
 
 module.exports.updateAccountNoPw = (first, last, email, id) => {
@@ -77,7 +85,7 @@ module.exports.updateFullAccount = (first, last, email, password, id) => {
 module.exports.upsertProfileInfo = (age, city, url, user_id) => {
     return db.query(
         `INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET age = $1, city = $2, url = $3;`,
-        [age, city, url, user_id]
+        [input.checkAge(age), city, input.checkUrl(url), user_id]
     );
 };
 
@@ -85,7 +93,7 @@ module.exports.getSupporters = () => {
     return db.query(`
         SELECT users.first AS first, users.last AS last, user_profiles.age AS age, user_profiles.city AS city, user_profiles.url AS url
         FROM users
-        JOIN user_profiles
+        LEFT JOIN user_profiles
         ON users.id = user_profiles.user_id
         JOIN signatures
         ON user_profiles.user_id = signatures.user_id;

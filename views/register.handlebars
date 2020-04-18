@@ -2,18 +2,17 @@
     {{> img}}
     <h1>Make Godzilla Feared Again</h1>
     {{#if error}}
-    <div><h3>⛔️ Please fill out all fields to register an account!</h3></div>
+    <div id="error"><h3>⛔️ Please fill out all fields or choose a different email address!</h3></div>
     {{/if}}
-    <p>Please register an account to support the petition or <a href="/login">log in here</a></p>
-</div>
-
+    <p>Let the almighty Godzilla strike fear into the good people of Tokyo once again! Sign to support inviting Godzilla to the Olympic Games in 2021.<br />Let him do his thing! Please register an account to support the petition or <a href="/login">log in here</a>.</p>
 
     <form method="POST">
         <input name="first" type="text" placeholder="First name" autocomplete="off">
         <input name="last" type="text" placeholder="Last name" autocomplete="off">
         <input name="email" type="email" placeholder="Email address" autocomplete="off">
-        <input name="pw" type="password" placeholder="Password" autocomplete="off">
+        <input name="password" type="password" placeholder="Password" autocomplete="off">
         <!-- Always add the following line when using CSRF middleware -->
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button>Submit</button>
     </form>
+</div>

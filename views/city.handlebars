@@ -5,10 +5,10 @@
 
 <p>Of course, the list is going to grow!</p>
 
-</div>
 <div class="signers">
 {{#citySupporters}}
-<div><p><a href="{{user_url}}" target="_blank">{{user_firstname}} {{user_lastname}}</a>, {{user_age}}</p></div>
+<div><p>{{#if this.user_url}}<a href="{{user_url}}" target="_blank">{{/if}}{{user_firstname}} {{user_lastname}}{{#if this.user_url}}</a>{{/if}}{{#if this.user_age}}, {{user_age}}{{/if}}</p></div>
 {{/citySupporters}}
+</div>
 </div>
 {{> nav}}

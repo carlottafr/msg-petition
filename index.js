@@ -96,7 +96,7 @@ app.post("/register", (req, res) => {
                 res.render("register", { error: true });
             });
     } else if (
-        // the values are empty
+        // if one of the fields is empty
         first == "" ||
         last == "" ||
         email == "" ||
@@ -125,26 +125,26 @@ app.post("/profile", (req, res) => {
     let { age, city, url } = req.body;
     const { user } = req.session;
     // check for bad URL
-    if (
-        url != "" &&
-        !url.startsWith("http://") &&
-        !url.startsWith("https://")
-    ) {
-        res.render("profile", { badUrl: true });
-    } else if (age == "" && city == "" && url == "") {
-        // if the user has not entered anything,
-        // redirect to petition
-        res.redirect("/petition");
-    } else {
-        db.addProfileInfo(age, city, url, user.userId)
-            .then(() => {
-                res.redirect("/petition");
-            })
-            .catch((err) => {
-                console.log("Error in addProfileInfo: ", err);
-                res.render("profile", { error: true });
-            });
-    }
+    // if (
+    //     url != "" &&
+    //     !url.startsWith("http://") &&
+    //     !url.startsWith("https://")
+    // ) {
+    //     res.render("profile", { badUrl: true });
+    //     // } else if (age == "" && city == "" && url == "") {
+    //     //     // if the user has not entered anything,
+    //     //     // redirect to petition
+    //     //     res.redirect("/petition");
+    // } else {
+    db.addProfileInfo(age, city, url, user.userId)
+        .then(() => {
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("Error in addProfileInfo: ", err);
+            res.render("profile", { error: true });
+        });
+    // }
 });
 
 // GET /login
@@ -194,15 +194,22 @@ app.post("/login", (req, res) => {
         })
         .then((userId) => {
             // check for signature with user ID
-            db.checkSignature(userId).then((sigId) => {
-                if (sigId.rows[0].id) {
-                    // store the signature ID in the cookie
-                    req.session.user.sigId = sigId.rows[0].id;
-                    res.redirect("/thanks");
-                } else if (!sigId.rows[0].id) {
-                    res.redirect("/petition");
-                }
-            });
+            db.checkSignature(userId)
+                .then((sigId) => {
+                    if (sigId.rows[0].id) {
+                        // store the signature ID in the cookie
+                        req.session.user.sigId = sigId.rows[0].id;
+                        res.redirect("/thanks");
+                    } else if (!sigId.rows[0].id) {
+                        res.redirect("/petition");
+                    }
+                })
+                .catch((err) => {
+                    console.log(
+                        "Error in checkSignature for POST /login: ",
+                        err
+                    );
+                });
         })
         .catch((err) => {
             console.log("Error in checkLogin: ", err);
@@ -235,7 +242,6 @@ app.post("/petition", (req, res) => {
                 // console.log("That worked, here is the ID: ", result.rows[0].id);
                 // set ID cookie
                 user.sigId = result.rows[0].id;
-                console.log("This is the session cookie: ", user);
                 res.redirect("/thanks");
             })
             .catch((err) => {
@@ -305,14 +311,8 @@ app.get("/thanks", (req, res) => {
 app.get("/profile/edit", (req, res) => {
     const { user } = req.session;
     db.displayInfo(user.userId).then((result) => {
-        let profile = result.rows;
         res.render("edit", {
-            first: profile[0].user_firstname,
-            last: profile[0].user_lastname,
-            email: profile[0].user_email,
-            age: profile[0].user_age,
-            city: profile[0].user_city,
-            url: profile[0].user_url,
+            result,
         });
     });
 });
@@ -323,32 +323,7 @@ app.get("/profile/edit", (req, res) => {
 app.post("/profile/edit", (req, res) => {
     let { first, last, email, pw, age, city, url } = req.body;
     const { user } = req.session;
-    // check for bad URL
-    if (
-        url != "" &&
-        !url.startsWith("http://") &&
-        !url.startsWith("https://")
-    ) {
-        // if there is one, rerender
-        // the page with all info and
-        // the bad URL warning
-        db.displayInfo(user.userId)
-            .then((result) => {
-                let profile = result.rows;
-                res.render("edit", {
-                    first: profile[0].user_firstname,
-                    last: profile[0].user_lastname,
-                    email: profile[0].user_email,
-                    age: profile[0].user_age,
-                    city: profile[0].user_city,
-                    url: profile[0].user_url,
-                    badUrl: true,
-                });
-            })
-            .catch((err) => {
-                console.log("Error in re-rendering after badUrl: ", err);
-            });
-    } else if (pw != "") {
+    if (pw != "") {
         // if there is an entered password,
         // bring out the big gears with a
         // full-on account update/upsert
@@ -372,15 +347,9 @@ app.post("/profile/edit", (req, res) => {
                     // with all existing info + error msg
                     db.displayInfo(user.userId)
                         .then((result) => {
-                            let profile = result.rows;
+                            result.error = true;
                             res.render("edit", {
-                                first: profile[0].user_firstname,
-                                last: profile[0].user_lastname,
-                                email: profile[0].user_email,
-                                age: profile[0].user_age,
-                                city: profile[0].user_city,
-                                url: profile[0].user_url,
-                                error: true,
+                                result,
                             });
                         })
                         .catch((err) => {
@@ -410,15 +379,9 @@ app.post("/profile/edit", (req, res) => {
                 // with all existing info + error msg
                 db.displayInfo(user.userId)
                     .then((result) => {
-                        let profile = result.rows;
+                        result.error = true;
                         res.render("edit", {
-                            first: profile[0].user_firstname,
-                            last: profile[0].user_lastname,
-                            email: profile[0].user_email,
-                            age: profile[0].user_age,
-                            city: profile[0].user_city,
-                            url: profile[0].user_url,
-                            error: true,
+                            result,
                         });
                     })
                     .catch((err) => {

@@ -1,8 +1,6 @@
 <div class="container">
     {{> img}}
     <h1>Make Godzilla Feared Again</h1>
-    <p>Thank you for registering &ndash; you may now add additional info below</p>
-</div>
 
 {{#if error}}
     <div id="error"><h3>⛔️ Uh oh, something went wrong. Please try again!</h3></div>
@@ -12,6 +10,8 @@
     <div id="error"><h3>⛔️ Please start your homepage link with either <em>http://</em> or <em>https://</em> &ndash; or leave the field empty!</h3></div>
 {{/if}}
 
+    <p>Thank you for registering &ndash; you may now add additional info below</p>
+
     <form method="POST">
         <input name="age" type="number" placeholder="Age" autocomplete="off">
         <input name="city" type="text" placeholder="City" autocomplete="off">
@@ -20,3 +20,5 @@
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button>Submit</button>
     </form>
+
+</div>
