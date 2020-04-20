@@ -200,6 +200,8 @@ app.get("/logout", (req, res) => {
 
 // server set-up: Heroku & local
 
-app.listen(process.env.PORT || 8080, () =>
-    console.log("Express server is at your service.")
-);
+if (require.main === module) {
+    app.listen(process.env.PORT || 8080, () =>
+        console.log("Express server is at your service.")
+    );
+}
