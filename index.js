@@ -73,13 +73,7 @@ app.use("/profile", profileRouter);
 // GET /petition
 
 app.get("/petition", requireNoSignature, (req, res) => {
-    // check for signature ID cookie
-    const { user } = req.session;
-    if (user.sigId) {
-        res.redirect("/thanks");
-    } else {
-        res.render("petition");
-    }
+    res.render("petition");
 });
 
 // POST /petition
@@ -169,51 +163,32 @@ app.post("/thanks/delete", requireSignature, (req, res) => {
 // GET /signers
 
 app.get("/signers", requireSignature, (req, res) => {
-    // if a cookie is set, render
-    const { user } = req.session;
-    if (user) {
-        // check for signature
-        if (user.sigId) {
-            db.getSupporters()
-                .then((result) => {
-                    return result.rows;
-                })
-                .then((results) => {
-                    res.render("signers", { supporters: results });
-                })
-                .catch((err) => {
-                    console.log("Error in getSupporters: ", err);
-                });
-        } else {
-            // if no signature, back to signing!
-            res.redirect("/petition");
-        }
-        // if no user cookie, back to registering
-    } else {
-        res.redirect("/register");
-    }
+    db.getSupporters()
+        .then((result) => {
+            return result.rows;
+        })
+        .then((results) => {
+            res.render("signers", { supporters: results });
+        })
+        .catch((err) => {
+            console.log("Error in getSupporters: ", err);
+        });
 });
 
 // GET /signers/city
 
 app.get("/signers/:city", requireSignature, (req, res) => {
-    const { user } = req.session;
-    // if a cookie is set, render
-    if (user) {
-        const city = req.params.city;
-        db.supportersCity(city)
-            .then((result) => {
-                return result.rows;
-            })
-            .then((results) => {
-                res.render("city", { place: city, citySupporters: results });
-            })
-            .catch((err) => {
-                console.log("Error in supportersCity: ", err);
-            });
-    } else {
-        res.redirect("/register");
-    }
+    const city = req.params.city;
+    db.supportersCity(city)
+        .then((result) => {
+            return result.rows;
+        })
+        .then((results) => {
+            res.render("city", { place: city, citySupporters: results });
+        })
+        .catch((err) => {
+            console.log("Error in supportersCity: ", err);
+        });
 });
 
 // GET /logout
