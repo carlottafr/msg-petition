@@ -8,8 +8,8 @@ module.exports.checkAge = (age) => {
 
 module.exports.checkUrl = (url) => {
     if (
-        url != "" ||
-        !url.startsWith("http://") ||
+        url != "" &&
+        !url.startsWith("http://") &&
         !url.startsWith("https://")
     ) {
         return null;
