@@ -149,11 +149,7 @@
     }
 
     .container-signers {
-        grid-template-rows: 200px 55px 35px 200px;
-    }
-
-    .container-signers p {
-        grid-row: 3;
+        grid-template-rows: 200px 55px 1fr;
     }
 
     .edit {
@@ -223,7 +219,7 @@
     }
 
     .signers {
-        grid-row: 4;
+        grid-row: 3;
     }
 
     .signers div {
