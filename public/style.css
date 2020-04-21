@@ -120,16 +120,20 @@
         margin-top: 20px;
     }
 
-    .container {
+    .container,
+    .container-signers {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: 200px 55px 55px 35px 140px;
         justify-content: center;
         align-items: center;
         text-align: center;
     }
 
-    .container #godzilla {
+    .container {
+        grid-template-rows: 200px 55px 55px 35px 140px;
+    }
+
+    #godzilla {
         height: auto;
         width: 100%;
         background-size: contain;
@@ -142,6 +146,14 @@
 
     .container p {
         grid-row: 4;
+    }
+
+    .container-signers {
+        grid-template-rows: 200px 55px 35px 200px;
+    }
+
+    .container-signers p {
+        grid-row: 3;
     }
 
     .edit {
@@ -211,7 +223,7 @@
     }
 
     .signers {
-        grid-row: 5;
+        grid-row: 4;
     }
 
     .signers div {
