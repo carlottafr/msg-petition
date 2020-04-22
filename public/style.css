@@ -224,9 +224,12 @@
 
     .signers div {
         text-align: center;
-        font-size: 20px;
         -webkit-animation: popup 2s;
         animation: popup 2s;
+    }
+
+    .signers div p {
+        font-size: 14px;
     }
 
     @keyframes popup {
