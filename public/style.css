@@ -267,9 +267,8 @@
 
     #error,
     #success {
-        padding: 5px;
-        height: 50px;
-        width: 700px;
+        height: 40px;
+        width: 600px;
         grid-row: 3;
         margin: 0 auto;
     }
